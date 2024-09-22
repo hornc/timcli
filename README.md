@@ -43,8 +43,8 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   -d, --debug           turn on debug output
-  -org ORG ORG          VRAM <x y> offset of the image (Default: 640 0)
-  -plt PLT PLT          VRAM <x y> offset of the CLUT (Default: 0 480)
+  -org ORG ORG          VRAM <x y> offset of the image
+  -plt PLT PLT          VRAM <x y> offset of the CLUT
   -o OUTPUT, --output OUTPUT
                         output file to write to
 ```

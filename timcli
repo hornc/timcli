@@ -24,8 +24,8 @@ def main():
     parser = argparse.ArgumentParser(description="PSX TIM image file format command line utility.")
     parser.add_argument('file', help='TIM file to process')
     parser.add_argument('-d', '--debug', help='turn on debug output', action='store_true')
-    parser.add_argument('-org', help='VRAM <x y> offset of the image (Default: 640 0)', type=int, nargs=2)
-    parser.add_argument('-plt', help='VRAM <x y> offset of the CLUT (Default: 0 480)', type=int, nargs=2)
+    parser.add_argument('-org', help='VRAM <x y> offset of the image', type=int, nargs=2)
+    parser.add_argument('-plt', help='VRAM <x y> offset of the CLUT', type=int, nargs=2)
     parser.add_argument('-o', '--output', help='output file to write to')
     args = parser.parse_args()
 
