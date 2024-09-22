@@ -1,0 +1,127 @@
+#!/usr/bin/env python3
+import argparse
+import os
+import sys
+
+
+"""
+TIM CLI
+"""
+
+# http://www.psxdev.net/forum/viewtopic.php?t=109
+
+BPP = {
+        0:  4,  # '4-bit (color indices)',
+        1:  8,  # '8-bit (color indices)',
+        2: 16,  #'16-bit (actual colors)',
+        3: 24,  #'24-bit (actual colors)'
+}
+EN = 'little'  # endianess
+DEFAULT_OUTFILE = 'output.tim'
+
+
+def main():
+    parser = argparse.ArgumentParser(description="PSX TIM image file format command line utility.")
+    parser.add_argument('file', help='TIM file to process')
+    parser.add_argument('-d', '--debug', help='turn on debug output', action='store_true')
+    parser.add_argument('-org', help='VRAM <x y> offset of the image (Default: 640 0)', type=int, nargs=2)
+    parser.add_argument('-plt', help='VRAM <x y> offset of the CLUT (Default: 0 480)', type=int, nargs=2)
+    parser.add_argument('-o', '--output', help='output file to write to')
+    args = parser.parse_args()
+
+    fname = args.file
+    debug = args.debug
+    write = bool(args.output or args.org or args.plt)
+    outfile = args.output or DEFAULT_OUTFILE
+
+    print(f'TIM: {os.path.basename(fname)}')
+    with(open(fname, 'rb')) as f:
+        tag = f.read(1)
+        assert tag == b'\x10', "Not a .tim?"
+        version = f.read(1)
+        f.seek(4)
+        flags = ord(f.read(1))
+        bpp = flags & 3
+        clp = flags >> 3 & 1
+        if debug:
+            print(f'Flags: {flags} = {bin(flags)}')
+            print('BPP:', bin(bpp), 'CLP:', bin(clp))
+
+        f.seek(8)
+        if clp:  # CLUT present
+            clut_len = int.from_bytes(f.read(4), EN)
+            clut_x = int.from_bytes(f.read(2), EN)
+            clut_y = int.from_bytes(f.read(2), EN)
+            clut_w = int.from_bytes(f.read(2), EN)
+            clut_h = int.from_bytes(f.read(2), EN)
+            if debug:
+                print('CLUT len:', clut_len, f'({hex(clut_len)})')
+                print(f'xy: ({clut_x}, {clut_y}) wh: ({clut_w} x {clut_h})')
+                print('CLUT:')
+            for i in range(clut_w * clut_h):
+                col = int.from_bytes(f.read(2), EN)
+                r = col & 0xF
+                g = col >> 4 & 0xF
+                b = col >> 8 & 0xF
+                stb = col >> 15
+                if debug:
+                    print(f'  {i}: ({r}, {g}, {b}) {"TRANS" if stb else ""}')
+            f.seek(clut_len + 8)
+
+        # Image:
+        img_len = int.from_bytes(f.read(4), EN)
+        img_x = int.from_bytes(f.read(2), EN)
+        img_y = int.from_bytes(f.read(2), EN)
+        img_w = int.from_bytes(f.read(2), EN)
+        img_h = int.from_bytes(f.read(2), EN)
+        if debug:
+            print('IMG len:', img_len, f'({hex(img_len)})')
+            print(f'xy: ({img_x}, {img_y}) wh: ({img_w} x {img_h})')
+
+        if debug and clp:
+            # Output image by color index value:
+            for i in range(img_h):
+                for j in range(img_w):
+                    cols = int.from_bytes(f.read(2), EN)
+                    if bpp == 1:
+                        print(cols & 0xFF, cols >> 8 & 0xFF, end=' ')
+                    else:
+                        print(cols & 0xF, cols >> 4 & 0xF, cols >> 8 & 0xF, cols >> 12 & 0xF, end=' ')
+                print('')
+
+        f.seek(0, os.SEEK_END)  # Move to end-of-file
+
+        file_size = f.tell()
+        bit_depth = BPP[bpp]
+        print()
+        print(f'     File size: {file_size:>7} bytes')
+        print(f'          Size: w: {img_w * 16 // bit_depth:>4} h: {img_h:>3}')
+        print(f'     Bit depth: {bit_depth:>7}', '(color indices)' if bit_depth < 16 else '(actual color)')
+        print(f'  Image origin: x: {img_x:>4} y: {img_y:>3}')
+        print(f'Palette origin: x: {clut_x:>4} y: {clut_y:>3}')
+
+        if write:
+            writetim(f, outfile, clut_len, args.plt, args.org)
+
+
+def writetim(original, outfile, clut_len, plt, org):
+        print(f'Attempting to write TIM data to {outfile}...')
+        with open(outfile, 'wb') as timout:
+            original.seek(0)
+            timout.write(original.read(12))
+            if clut_len and plt:
+                original.read(4)
+                clut_xy = plt[0].to_bytes(2, EN) + plt[1].to_bytes(2, EN)  
+                timout.write(clut_xy)
+                timout.write(original.read(clut_len - 4))
+            elif clut_len:  # Write existing CLUT / palette x,y
+                timout.write(original.read(clut_len))
+            if org:
+                original.read(4)
+                img_xy = org[0].to_bytes(2, EN) + org[1].to_bytes(2, EN)
+                timout.write(img_xy)
+            timout.write(original.read())
+
+
+if __name__ == '__main__':
+    main()
