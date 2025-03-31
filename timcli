@@ -98,7 +98,8 @@ def main():
         print(f'          Size: w: {img_w * 16 // bit_depth:>4} h: {img_h:>3}')
         print(f'     Bit depth: {bit_depth:>7}', '(color indices)' if bit_depth < 16 else '(actual color)')
         print(f'  Image origin: x: {img_x:>4} y: {img_y:>3}')
-        print(f'Palette origin: x: {clut_x:>4} y: {clut_y:>3}')
+        if bit_depth < 16:
+            print(f'Palette origin: x: {clut_x:>4} y: {clut_y:>3}')
 
         if write:
             writetim(f, outfile, clut_len, args.plt, args.org)
