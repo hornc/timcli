@@ -14,7 +14,7 @@ on other platforms and with all valid TIM images.
 I am happy to make or accept changes to fix compatibility issues and make this more widely useful.
 
 For TIM image conversions from other formats you might want to use Lameguy64's C++ tool: [IMG2TIM](https://github.com/Lameguy64/img2tim), or
-try the [Gimp TIM plugin](https://github.com/hornc/psxdev/tree/master/psxdev-gimp-2.0.0) which I have tried
+try the [Gimp TIM plugin](https://github.com/hornc/psxdev-gimp) which I have tried
 to bring up to date with recent versions of Gimp, but probably needs some more attention to be fully
 functional.
 
