@@ -11,7 +11,7 @@ debug code to be easily hacked in Python for quick testing and troubleshooting.
 Has only been tested on Linux, and not yet with 16 or 24bit images, although it should work
 on other platforms and with all valid TIM images.
 
-I am happy to make or accept changes to fix compaitibilty issues and make this more widely useful.
+I am happy to make or accept changes to fix compatibility issues and make this more widely useful.
 
 For TIM image conversions from other formats you might want to use Lameguy64's C++ tool: [IMG2TIM](https://github.com/Lameguy64/img2tim), or
 try the [Gimp TIM plugin](https://github.com/hornc/psxdev/tree/master/psxdev-gimp-2.0.0) which I have tried
