@@ -61,6 +61,8 @@ TIM: texture64_320x240-NTSC.tim
      Bit depth:       4 (color indices)
   Image origin: x:  640 y:   0
 Palette origin: x:    0 y: 480
+   CLUT length: 44 bytes (11 32bit words)
+  Image length: 2060 bytes (515 32bit words)
 ```
 
 ### Image / CLUT offset rewrite
