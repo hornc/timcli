@@ -100,6 +100,8 @@ def main():
         print(f'  Image origin: x: {img_x:>4} y: {img_y:>3}')
         if bit_depth < 16:
             print(f'Palette origin: x: {clut_x:>4} y: {clut_y:>3}')
+            print(f'   CLUT length: {clut_len} bytes ({clut_len // 4} 32bit words)')
+        print(f'  Image length: {img_len} bytes ({img_len // 4} 32bit words)')
 
         if write:
             writetim(f, outfile, clut_len, args.plt, args.org)
